@@ -7,7 +7,7 @@ function Init()
     end
     -- require ("util.csvtolua")(_gamedir.."/gameconfig") 
     InitLuahotupdate()
-    TimerMgr:Get():On(ShowMem):Time(5)
+    -- TimerMgr:Get():On(ShowMem):Time(2)
 end
 
 function InitLuahotupdate()
@@ -27,6 +27,7 @@ function Tick(delta)
     Xpcall(f)
 end
 --for object orientation
+-- execution sequence : basec++ ctor -> baselua ctor -> derivedc++ ctor -> derivedlua ctor
 function Ctor(classpath, inscpp, ...)
     local inslua = _objectins2luatable[inscpp]
     if type(inscpp) == "table" then
@@ -43,6 +44,10 @@ function Ctor(classpath, inscpp, ...)
             end
             if class:IsChildOf(CppSingleton) then
                 class._ins = inslua
+            end
+            local CtorFunc = rawget(class, "Ctor")
+            if CtorFunc then
+                CtorFunc(inslua)
             end
         end
     else

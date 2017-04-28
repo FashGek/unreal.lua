@@ -7,6 +7,9 @@ end
 function FVector:__mul(other)
  	return UKismetMathLibrary.Multiply_VectorFloat(self, other)
 end 
+function FVector:__tostring()
+	return "X:"..self.X.."Y:"..self.Y.."Z:"..self.Z
+end
 local FVector_CppNew = FVector.New
 function FVector.New(x, y, z)
 	local v = FVector_CppNew()

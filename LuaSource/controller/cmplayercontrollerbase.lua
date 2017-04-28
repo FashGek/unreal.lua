@@ -1,4 +1,9 @@
-local CMPlayerControllerBase = Inherit(CppSingleton, ACMPlayerControllerBase)
+local CMPlayerControllerBase = Inherit(CppObjectBase, ACMPlayerControllerBase)
+
+function CMPlayerControllerBase:Ctor( )
+	self.m_InputMgr = InputMgr:NewIns(self)
+	G_GameStatics.GameMode:AddPlayerController(self)
+end
 
 function CMPlayerControllerBase:BeginPlay()
 
@@ -17,7 +22,7 @@ function CMPlayerControllerBase:PostProcessInput(DeltaTime, bGamePaused)
 end
 
 function CMPlayerControllerBase:ProcessPlayerInput(DeltaTime, bGamePaused)
-	InputMgr:Get():Update(self:GetInputState(), DeltaTime, bGamePaused)
+	self.m_InputMgr:Update(self:GetInputState(), DeltaTime, bGamePaused)
 end
 
 return CMPlayerControllerBase

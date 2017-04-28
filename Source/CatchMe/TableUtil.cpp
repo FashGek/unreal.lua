@@ -418,6 +418,7 @@ void UTableUtil::pushclass(const char* classname, void* p, bool bgcrecord)
 		lua_pushnil(L);
 		return;
 	}
+// should do in glue code , later
 	bool bIsActorOrObject = (classname[0] == 'U' || classname[0] == 'A');
 	if (!existdata(p))
 	{
@@ -454,6 +455,17 @@ void UTableUtil::pushclass(const char* classname, void* p, bool bgcrecord)
 		if (lua_isnil(L, -1))
 		{
 			lua_pop(L, 2);
+#ifdef LuaDebug
+			lua_getfield(L, -1, "classname");
+			FString oldname = lua_tostring(L, -1);
+			countforgc[oldname]--;
+			if (countforgc.Contains(classname))
+				countforgc[classname]++;
+			else
+				countforgc.Add(classname, 1);
+			lua_pop(L, 1);
+
+#endif
 			setmeta(classname, -1);
 		}
 		else

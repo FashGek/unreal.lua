@@ -1,6 +1,19 @@
 local SimpleDlg = require "simpledlg"
 local testUmg = Inherit(SimpleDlg, UUserWidget)
+testUmg:DynamicLoad("test")
+function testUmg:Ctor(controller)
+	self:Wnd("btn_clear"):Event("OnClicked", controller.ClearAllCharacter, controller)
+	self:Wnd("play"):Event("OnClicked", self.PlayAnim, self)
+	self.controller = controller
+	-- self.Anim = UAnimMontage.FObjectFinder("/Game/Mannequin/Animations/NewAnimMontage")
+	-- local anim = UAnimMontage.LoadObject(self, "/Game/Mannequin/Animations/NewAnimMontage")
+	-- A_(self.Anim)
+end
 
-testUmg:SetUmgPath("test")
+function testUmg:PlayAnim()
+	local AnimIns = self.controller:GetAnimIns()
+	local anim = UAnimMontage.LoadObject(self, "/Game/Mannequin/Animations/NewAnimMontage")
+	AnimIns:Montage_Play(anim, 0.5)
+end
 
 return testUmg

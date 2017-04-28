@@ -132,17 +132,6 @@ local function __newindexcpp(t, k, v)
 	rawset(t, k, v)
 end
 
-local function NewInsCpp(self, ...)
-	if not rawget(self, "_meta_") then
-		error("not class")
-	end
-	local ins = self:Ins()
-	ins._cppinstance_ = self._cppclass.New()
-	_objectins2luatable[inscpp] = ins
-	ins:Initialize(...)
-	return ins
-end
-
 local function Bind(self, inscpp)
 	if self._cppinstance_ then 
 		_objectins2luatable[self._cppinstance_] = nil	
@@ -156,7 +145,6 @@ function Inherit(parent, cppclass)
 	TheNewClass._parentclass = parent
 	if parent.__iscppclass or cppclass then
 		TheNewClass._cppclass = cppclass or parent._cppclass or parent
-		TheNewClass.NewInsCpp = NewInsCpp
 		TheNewClass.__index = __indexcpp
 		TheNewClass.__newindex = __newindexcpp
 	else
@@ -220,26 +208,27 @@ end
 
 function Singleton:Get(...)
 	local meta = self._meta_
-	if meta._ins == nil then
-		meta._ins = setmetatable({}, self)
-		meta._ins:Initialize(...)
+	if rawget(meta, "_ins") == nil then
+		local ins = setmetatable({}, self)
+		rawset(meta, "_ins", ins)
+		ins:Initialize(...)
 	end
 	return meta._ins
 end
 
 function Singleton:GetRaw()
-	return self._meta_._ins
+	return rawget(self._meta_, "_ins")
 end
 
 function Singleton:Release(...)
 	local meta = self._meta_
-	if meta._ins then
+	if rawget(meta, "_ins") then
 		InternDestroy(meta, meta._ins, ...)
 	end
 end
 
 function Singleton:Destroy()
-	self._meta_._ins = nil
+	rawset(self._meta_,"_ins", nil)
 end
 
 local map = {

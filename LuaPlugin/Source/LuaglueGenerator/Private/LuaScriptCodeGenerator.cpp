@@ -1175,28 +1175,28 @@ FString FLuaScriptCodeGenerator::ExportAdditionalClassGlue(const FString& ClassN
 	const FString ClassName = Class->GetName();
 
 	// Constructor and destructor
+	GeneratedGlue += GenerateWrapperFunctionDeclaration(ClassNameCPP, Class->GetName(), TEXT("New"));
+	GeneratedGlue += TEXT("\r\n{\r\n");
+	GeneratedGlue += TEXT("\tUObject* Outer = (UObject*)UTableUtil::tousertype(\"UObject\", 1);\r\n");
+	GeneratedGlue += TEXT("\tFName Name = FName(luaL_checkstring(L, 2));\r\n");
+	GeneratedGlue += FString::Printf(TEXT("\tUObject* Obj = NewObject<%s>(Outer, Name);\r\n"), *ClassNameCPP);
+	GeneratedGlue += TEXT("\tif (Obj)\r\n\t{\r\n");
+	GeneratedGlue += TEXT("\t\t\tUTableUtil::addgcref(Obj);\r\n");
+	GeneratedGlue += TEXT("\t}\r\n");
+	GeneratedGlue += FString::Printf(TEXT("\tUTableUtil::pushclass(\"%s\", (void*)Obj, true);\r\n"), *ClassNameCPP);
+	GeneratedGlue += TEXT("\treturn 1;\r\n");
+	GeneratedGlue += TEXT("}\r\n\r\n");
+
+	GeneratedGlue += GenerateWrapperFunctionDeclaration(ClassNameCPP, Class->GetName(), TEXT("Destroy"));
+	GeneratedGlue += TEXT("\r\n{\r\n");
+	GeneratedGlue += FString::Printf(TEXT("\t%s\r\n"), *GenerateObjectDeclarationFromContext(ClassNameCPP));
+	GeneratedGlue += TEXT("\tif (Obj)\r\n\t{\r\n");
+	GeneratedGlue += TEXT("\t\t\tUTableUtil::rmgcref(Obj);\r\n");
+	GeneratedGlue += TEXT("\t}\r\n\treturn 0;\r\n");
+	GeneratedGlue += TEXT("}\r\n\r\n");
+
 	if (!(Class->GetClassFlags() & CLASS_Abstract))
 	{
-		GeneratedGlue += GenerateWrapperFunctionDeclaration(ClassNameCPP, Class->GetName(), TEXT("New"));
-		GeneratedGlue += TEXT("\r\n{\r\n");
-		GeneratedGlue += TEXT("\tUObject* Outer = (UObject*)UTableUtil::tousertype(\"UObject\", 1);\r\n");
-		GeneratedGlue += TEXT("\tFName Name = FName(luaL_checkstring(L, 2));\r\n");
-		GeneratedGlue += FString::Printf(TEXT("\tUObject* Obj = NewObject<%s>(Outer, Name);\r\n"), *ClassNameCPP);
-		GeneratedGlue += TEXT("\tif (Obj)\r\n\t{\r\n");
-		GeneratedGlue += TEXT("\t\t\tUTableUtil::addgcref(Obj);\r\n");
-		GeneratedGlue += TEXT("\t}\r\n");
-		GeneratedGlue += FString::Printf(TEXT("\tUTableUtil::pushclass(\"%s\", (void*)Obj, true);\r\n"), *ClassNameCPP);
-		GeneratedGlue += TEXT("\treturn 1;\r\n");
-		GeneratedGlue += TEXT("}\r\n\r\n");
-
-		GeneratedGlue += GenerateWrapperFunctionDeclaration(ClassNameCPP, Class->GetName(), TEXT("Destroy"));
-		GeneratedGlue += TEXT("\r\n{\r\n");
-		GeneratedGlue += FString::Printf(TEXT("\t%s\r\n"), *GenerateObjectDeclarationFromContext(ClassNameCPP));
-		GeneratedGlue += TEXT("\tif (Obj)\r\n\t{\r\n");
-		GeneratedGlue += TEXT("\t\t\tUTableUtil::rmgcref(Obj);\r\n");
-		GeneratedGlue += TEXT("\t}\r\n\treturn 0;\r\n");
-		GeneratedGlue += TEXT("}\r\n\r\n");
-
 		GeneratedGlue += GenerateWrapperFunctionDeclaration(ClassNameCPP, Class->GetName(), TEXT("CreateDefaultSubobject"));
 		GeneratedGlue += TEXT("\r\n{\r\n");
 		GeneratedGlue += TEXT("\tUObject* Outer = (UObject*)UTableUtil::tousertype(\"UObject\", 1);\r\n");
@@ -1260,10 +1260,10 @@ FString FLuaScriptCodeGenerator::ExportAdditionalClassGlue(const FString& ClassN
 	GeneratedGlue += TEXT("}\r\n\r\n");
 	//Library
 	GeneratedGlue += FString::Printf(TEXT("static const luaL_Reg %s_Lib[] =\r\n{\r\n"), *ClassName);
+	GeneratedGlue += FString::Printf(TEXT("\t{ \"New\", %s_New },\r\n"), *ClassNameCPP);
+	GeneratedGlue += FString::Printf(TEXT("\t{ \"Destroy\", %s_Destroy },\r\n"), *ClassNameCPP);
 	if (!(Class->GetClassFlags() & CLASS_Abstract))
 	{
-		GeneratedGlue += FString::Printf(TEXT("\t{ \"New\", %s_New },\r\n"), *ClassNameCPP);
-		GeneratedGlue += FString::Printf(TEXT("\t{ \"Destroy\", %s_Destroy },\r\n"), *ClassNameCPP);
 		GeneratedGlue += FString::Printf(TEXT("\t{ \"CreateDefaultSubobject\", %s_CreateDefaultSubobject },\r\n"), *ClassNameCPP);
 	}
 

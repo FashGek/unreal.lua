@@ -7,7 +7,7 @@ function CMGameMode:Ctor()
 end
 
 function CMGameMode:BeginPlay()
-	
+
 end
 
 return CMGameMode
