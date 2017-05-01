@@ -25,6 +25,9 @@ public:
 
 	/** update input detection */
 	virtual void ProcessPlayerInput(const float DeltaTime, const bool bGamePaused) override;
+
+	virtual void SetPawn(APawn* aPawn) override;
+
 	
 	UFUNCTION()
 	TArray<float> GetInputState();

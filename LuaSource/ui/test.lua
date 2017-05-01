@@ -11,9 +11,23 @@ function testUmg:Ctor(controller)
 end
 
 function testUmg:PlayAnim()
-	local AnimIns = self.controller:GetAnimIns()
-	local anim = UAnimMontage.LoadObject(self, "/Game/Mannequin/Animations/NewAnimMontage")
-	AnimIns:Montage_Play(anim, 0.5)
+	-- local AnimIns = self.controller:GetAnimIns()
+	-- local anim = UAnimMontage.LoadObject(self, "/Game/Mannequin/Animations/NewAnimMontage")
+	-- AnimIns:Montage_Play(anim, 0.5)
+	-- A_(self.controller.Character.Role)
+	A_(self.controller.Pawn)
+end
+
+function testUmg:Txt1(content)
+	self:Wnd("txt1"):SetText(tostring(content))
+end
+
+function testUmg:Txt2(content)
+	self:Wnd("txt2"):SetText(tostring(content))
+end
+
+function testUmg:Txt3(content)
+	self:Wnd("txt3"):SetText(tostring(content))
 end
 
 return testUmg

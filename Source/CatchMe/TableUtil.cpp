@@ -8,6 +8,10 @@
 DEFINE_LOG_CATEGORY(LuaLog);
 
 lua_State* UTableUtil::L = nullptr;
+int32 UTableUtil::ManualInitCount = 0;
+bool UTableUtil::HasManualInit = false;
+
+
 TMap<FString, TMap<FString, UProperty*>> UTableUtil::propertyMap;
 TMap<FString, TMap<FString, UFunction*>> UTableUtil::functionMap;
 // FLuaGcObj UTableUtil::gcobjs;
@@ -17,36 +21,40 @@ TMap<FString, int> UTableUtil::countforgc;
 // FLuaGcObj UTableUtil::gcobjs;
 void UTableUtil::InitClassMap()
 {
-	for (TObjectIterator<UClass> uClass; uClass; ++uClass)
-	{
-		UClass* theClass = *uClass;
-		FString className = FString::Printf(TEXT("%s%s"), theClass->GetPrefixCPP(), *theClass->GetName());
-		TMap<FString, UProperty*> m;
-		for (TFieldIterator<UProperty> PropertyIt(theClass); PropertyIt; ++PropertyIt)
+	static bool HasInit = false;
+	if (!HasInit) {
+		HasInit = true;
+		for (TObjectIterator<UClass> uClass; uClass; ++uClass)
 		{
-			UProperty* Property = *PropertyIt;
-			m.Add(Property->GetName(), Property);
+			UClass* theClass = *uClass;
+			FString className = FString::Printf(TEXT("%s%s"), theClass->GetPrefixCPP(), *theClass->GetName());
+			TMap<FString, UProperty*> m;
+			for (TFieldIterator<UProperty> PropertyIt(theClass); PropertyIt; ++PropertyIt)
+			{
+				UProperty* Property = *PropertyIt;
+				m.Add(Property->GetName(), Property);
+			}
+			propertyMap.Add(className, m);
+			TMap<FString, UFunction*> funcs;
+			for (TFieldIterator<UFunction> FuncIt(theClass); FuncIt; ++FuncIt)
+			{
+				UFunction* func = *FuncIt;
+				funcs.Add(func->GetName(), func);
+			}
+			functionMap.Add(className, funcs);
 		}
-		propertyMap.Add(className ,m);
-		TMap<FString, UFunction*> funcs;
-		for (TFieldIterator<UFunction> FuncIt(theClass); FuncIt; ++FuncIt)
+		for (TObjectIterator<UScriptStruct> uStruct; uStruct; ++uStruct)
 		{
-			UFunction* func = *FuncIt;
-			funcs.Add(func->GetName(), func);
+			auto theStruct = *uStruct;
+			FString className = FString::Printf(TEXT("%s%s"), theStruct->GetPrefixCPP(), *theStruct->GetName());
+			TMap<FString, UProperty*> m;
+			for (TFieldIterator<UProperty> PropertyIt(theStruct); PropertyIt; ++PropertyIt)
+			{
+				UProperty* Property = *PropertyIt;
+				m.Add(Property->GetName(), Property);
+			}
+			propertyMap.Add(className, m);
 		}
-		functionMap.Add(className, funcs);
-	}
-	for (TObjectIterator<UScriptStruct> uStruct; uStruct; ++uStruct)
-	{
-		auto theStruct = *uStruct;
-		FString className = FString::Printf(TEXT("%s%s"), theStruct->GetPrefixCPP(), *theStruct->GetName());
-		TMap<FString, UProperty*> m;
-		for (TFieldIterator<UProperty> PropertyIt(theStruct); PropertyIt; ++PropertyIt)
-		{
-			UProperty* Property = *PropertyIt;
-			m.Add(Property->GetName(), Property);
-		}
-		propertyMap.Add(className ,m);
 	}
 }
 
@@ -85,10 +93,22 @@ static int32 LuaPanic(lua_State *L)
 	return 0;
 }
 
-void UTableUtil::init()
+void UTableUtil::init(bool IsManual)
 {
+	if (IsManual)
+	{
+		++ManualInitCount;
+	}
 	if (L != nullptr)
-		return;
+	{
+		if (IsManual && !HasManualInit)
+		{
+			Call_void("Shutdown");
+			lua_close(L);
+		}
+		else
+			return;
+	}
 	InitClassMap();
 	auto l = lua_newstate(LuaAlloc, nullptr);
 	if (l) lua_atpanic(l, &LuaPanic);
@@ -136,11 +156,13 @@ void UTableUtil::init()
 		executeFunc("Init", 0, 0);
 		testtemplate();
 	}
+	HasManualInit = IsManual;
 }
 
 void UTableUtil::shutdown()
 {
-	if (L != nullptr)
+	--ManualInitCount;
+	if (L != nullptr && ManualInitCount == 0)
 	{
 		Call_void("Shutdown");
 		lua_close(L);

@@ -6,6 +6,7 @@
 
 void ACMPlayerControllerBase::BeginPlay()
 {
+	
 	Super::BeginPlay();
 	LuaCall("BeginPlay", this);
 }
@@ -32,6 +33,12 @@ void ACMPlayerControllerBase::ProcessPlayerInput(const float DeltaTime, const bo
 {
 	LuaCall("ProcessPlayerInput", this, DeltaTime, bGamePaused);
 	Super::ProcessPlayerInput(DeltaTime, bGamePaused);
+}
+
+void ACMPlayerControllerBase::SetPawn(APawn* aPawn)
+{
+	Super::SetPawn(aPawn);
+	LuaCall("SetPawn", this, aPawn);
 }
 
 TArray<float> ACMPlayerControllerBase::GetInputState()

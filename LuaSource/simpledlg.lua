@@ -1,7 +1,7 @@
 SimpleDlg = Inherit(CppObjectBase, UUserWidget)
 local WidgetType_Lua = {}
 local BasicWidget = require "ui.widgets.basicwidget"
-local PathPrefix = "/Game/"
+local PathPrefix = "/Game/Git/"
 
 function SimpleDlg:NewCpp(Object, ...)
 	if not self:Property("m_BpClass") then

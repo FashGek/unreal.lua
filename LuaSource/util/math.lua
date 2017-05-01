@@ -5,3 +5,4 @@ function MathDis(a, b)
 	end
 	return math.sqrt(total)
 end
+math.Dis = MathDis

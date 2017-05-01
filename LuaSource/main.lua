@@ -3,11 +3,11 @@ function Init()
     require "frame.initrequire"
     local function ShowMem()
         collectgarbage("collect")
-        a_("lua memory: ", collectgarbage("count"))
+        -- a_("lua memory: ", collectgarbage("count"))
     end
     -- require ("util.csvtolua")(_gamedir.."/gameconfig") 
     InitLuahotupdate()
-    -- TimerMgr:Get():On(ShowMem):Time(2)
+    TimerMgr:Get():On(ShowMem):Time(2)
 end
 
 function InitLuahotupdate()
@@ -65,9 +65,5 @@ end
 -- *******************************
 
 function Shutdown()
-    -- local function f( )
-    --     InputMgr:Get():Release()
-    --     TimerMgr:Get():Release()
-    -- end
-    -- Xpcall(f)
+    a_("lua VM shutdown")
 end

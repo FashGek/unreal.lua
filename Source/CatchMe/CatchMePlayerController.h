@@ -14,10 +14,14 @@ public:
 	
 	virtual void PlayerTick(float DeltaTime) override;
 
-	void SetNewMoveDestination(const FVector DestLocation);
-
 	UFUNCTION(reliable, server, WithValidation)
-	void MoveToLocation(FVector Location);
+	void S_MoveToLocation(FVector Location);
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+
+
+	UPROPERTY(Replicated)
+	ACharacter* PlayCharacter;
 };
 
 

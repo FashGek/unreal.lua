@@ -20,8 +20,8 @@ function InputMgr:Update1(bIsPress, Pos, DeltaTime, bGamePaused)
 	State.fHoldTime = State.fHoldTime + DeltaTime
 	if State.bIsPress then
 		if bIsPress then
-			if MathDis(Pos, State.vLastPos) >= 1 then
-				self.m_controller:HandleInput("InputTap_Move", Pos, State.fHoldTime)
+			if math.Dis(Pos, State.vLastPos) >= 1 then
+				self.m_controller:HandleInput("InputTap_Move", Pos, State.fHoldTime, {Pos[1]-State.vLastPos[1], Pos[2]-State.vLastPos[2]})
 			else
 				self.m_controller:HandleInput("InputTap_Hold", Pos, State.fHoldTime)
 			end

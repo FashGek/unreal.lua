@@ -4798,3 +4798,42 @@ public:
 	}
 };
 
+UCLASS(meta=(Lua=1))
+class UDelegate_ACatchMeAIController_ReceiveMoveCompleted : public UObject{
+	GENERATED_BODY()
+public:
+	TSet<int> LuaCallBacks;
+	UDelegate_ACatchMeAIController_ReceiveMoveCompleted() {};
+	using delegatetype = decltype(((ACatchMeAIController*)0)->ReceiveMoveCompleted);
+	void Init(delegatetype& theDelegate){
+		UTableUtil::addgcref((UObject*)this);
+		theDelegate.AddDynamic(this, &UDelegate_ACatchMeAIController_ReceiveMoveCompleted::CallBack);
+	}
+
+	UFUNCTION()
+	void CallBack( FAIRequestID RequestID, EPathFollowingResult::Type Result){
+		for (auto v : LuaCallBacks){
+			UTableUtil::call(v,  RequestID, (int)(Result));
+		}
+	}
+
+	UFUNCTION()
+	int Add() {int r = UTableUtil::pushluafunc(2);LuaCallBacks.Add(r);return r;}
+	UFUNCTION()
+	void Remove(int32 r)
+	{
+		if(LuaCallBacks.Contains(r)){
+			UTableUtil::unref(r);
+			LuaCallBacks.Remove(r);
+		}
+	}
+	UFUNCTION()
+	void Destroy() {
+		for(auto v : LuaCallBacks){
+			UTableUtil::unref(v);
+		}
+		LuaCallBacks.Reset();
+		UTableUtil::rmgcref(this);
+	}
+};
+

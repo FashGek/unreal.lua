@@ -21,6 +21,10 @@ function CMPlayerControllerBase:PostProcessInput(DeltaTime, bGamePaused)
 
 end
 
+function CMPlayerControllerBase:SetPawn(aPawn)
+	self.m_Pawn = aPawn
+end
+
 function CMPlayerControllerBase:ProcessPlayerInput(DeltaTime, bGamePaused)
 	self.m_InputMgr:Update(self:GetInputState(), DeltaTime, bGamePaused)
 end

@@ -16,3 +16,8 @@ void ACatchMeCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 }
+
+bool ACatchMeCharacter::IsReplicationPausedForConnection(const FNetViewer& ConnectionOwnerNetViewer)
+{
+	return LuaCallr(bool, "IsReplicationPausedForConnection", this, ConnectionOwnerNetViewer);
+}

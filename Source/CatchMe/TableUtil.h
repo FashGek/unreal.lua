@@ -7,10 +7,11 @@
 #include "traitstructclass.h"
 #include "TableUtil.generated.h"
 
-#define LuaCtor(classname, ptr, ...) UTableUtil::call("Ctor", classname, ptr, __VA_ARGS__);
+#define LuaCtor(classname, ...) UTableUtil::call("Ctor", classname, this, ##__VA_ARGS__);
 #define LuaCall(functionname, ptr, ...) UTableUtil::call("Call", functionname, ptr, __VA_ARGS__);
 #define LuaCallr(ret, functionname, ptr,...) UTableUtil::callr<ret>("Call", functionname, ptr, __VA_ARGS__);
 #define LuaStaticCall(functionname, ...)	UTableUtil::call(functionname, __VA_ARGS__);
+#define LuaStaticCallr(ret, functionname, ...)	UTableUtil::callr<ret>(functionname, ##__VA_ARGS__);
 
 struct EnumItem;
 DECLARE_LOG_CATEGORY_EXTERN(LuaLog, Log, All);
@@ -127,6 +128,9 @@ class UTableUtil : public UBlueprintFunctionLibrary
 
 public:
 	static lua_State* L;
+// temporarily for multi gameinstance, later I will add Multi Lua_State
+	static int32 ManualInitCount;
+	static bool HasManualInit;
 #ifdef LuaDebug
 	static TMap<FString, int> countforgc;
 #endif
@@ -134,7 +138,7 @@ public:
 	static void addmodule(const char* classname);
 
 	UFUNCTION(BlueprintCallable, Category = "TableUtil", meta = (DisplayName = "Initlua"))
-	static void init();
+	static void init(bool IsManual = false);
 
 	static void openmodule(const char* classname);
 	static void closemodule();
@@ -197,7 +201,7 @@ public:
 	// static FLuaGcObj gcobjs;
 	static int push() { return 0; }
 	template<typename T>
-	static int push(T value);
+	static int push(T& value);
 	template<typename T>
 	static int push(T* value);
 
@@ -281,10 +285,11 @@ int UTableUtil::push(T* value)
 }
 
 template<typename T>
-int UTableUtil::push(T value)
+int UTableUtil::push(T& value)
 {
 	// 	struct name trait, because xcode project GCC_ENABLE_CPP_RTTI = No, can't use typeid
-	pushclass(traitstructclass<T>::name(), (void*)(new T(value)), true);
+	// 	pushclass(traitstructclass<T>::name(), (void*)(new T(value)), true);
+	pushclass(traitstructclass<T>::name(), (void*)(&value));
 	return 1;
 }
 

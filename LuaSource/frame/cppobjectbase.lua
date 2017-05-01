@@ -20,6 +20,16 @@ function CppObjectBase:NewCpp(...)
 	return self._cppclass.New(...)
 end
 
+CppObjectBase.New = CppObjectBase.NewCpp
+
+function CppObjectBase:Ctor()
+	self._gc_list = {}
+end
+
+function CppObjectBase:GC(obj)
+	self._gc_list[obj] = true
+end
+
 function CppObjectBase:Property(property)
 	return rawget(self._meta_, property)	
 end
@@ -53,7 +63,6 @@ function CppSingleton:Get(...)
 	end
 	return meta._ins
 end
-
 
 
 

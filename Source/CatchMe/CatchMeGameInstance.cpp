@@ -8,9 +8,8 @@
 
 void UCatchMeGameInstance::Init()
 {
-// 	UTableUtil::shutdown();
 	Super::Init();
-	UTableUtil::init();
+	UTableUtil::init(true);
 }
 
 void UCatchMeGameInstance::Shutdown()

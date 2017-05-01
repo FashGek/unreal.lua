@@ -20,20 +20,26 @@ void ACatchMePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 }
 
-
-
-void ACatchMePlayerController::SetNewMoveDestination(const FVector DestLocation)
+void ACatchMePlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
-	LuaCall("MoveToPos", this, DestLocation);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	auto result = LuaStaticCallr(TArray<FReplifetimeCond>, "CMPlayerController_GetLifetimeReplicatedProps", this);
+	for (auto &v : result)
+	{
+		UProperty* p = UTableUtil::GetPropertyByName(ACatchMePlayerController::StaticClass(), v.PropertyName);
+		for (int32 i = 0; i < p->ArrayDim; i++)
+		{
+			OutLifetimeProps.AddUnique(FLifetimeProperty(p->RepIndex + i, v.Cond));
+		}
+	}
 }
 
-
-void ACatchMePlayerController::MoveToLocation_Implementation(FVector Location)
+void ACatchMePlayerController::S_MoveToLocation_Implementation(FVector Location)
 {
-	SetNewMoveDestination(Location);
+	LuaCall("MoveToPos", this, Location);
 }
 
-bool ACatchMePlayerController::MoveToLocation_Validate(FVector Location)
+bool ACatchMePlayerController::S_MoveToLocation_Validate(FVector Location)
 {
 	return true;
 }
