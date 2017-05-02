@@ -8,6 +8,7 @@ function Init()
     -- require ("util.csvtolua")(_gamedir.."/gameconfig") 
     InitLuahotupdate()
     TimerMgr:Get():On(ShowMem):Time(2)
+    require "util.sbcompletions".run()
 end
 
 function InitLuahotupdate()
