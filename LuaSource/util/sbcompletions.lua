@@ -71,7 +71,8 @@ function m.run()
    		code = code..key.."\n"
    	end
    	code = code.."]}"
-	local snipfile = io.open(_luadir.."\\sublimestuff\\".."completions.sublime-completions", "w")
+	-- local snipfile = io.open(_luadir.."\\sublimestuff\\".."completions.sublime-completions", "w")
+	local snipfile = io.open("C:\\Users\\Administrator\\AppData\\Roaming\\Sublime Text 3\\Packages\\completions.sublime-completions", "w")
 	snipfile:write(code)
 	snipfile:close()
 end

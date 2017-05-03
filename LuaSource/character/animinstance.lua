@@ -10,10 +10,9 @@ end
 
 function AnimInstance:NativeUpdateAnimation(delta)
 	self.WalkSpeed = #self.m_Pawn:GetVelocity()
-	if self.m_controller and self.m_controller.TestUI then
-		self.m_controller.TestUI:Txt1(self.WalkSpeed)		
-	else
-		self.m_controller = self.m_Pawn:GetController()
+	local controller = UGameplayStatics.GetPlayerController(self, 0)
+	if controller and controller.PlayCharacter == self.m_Pawn and controller.TestUI then
+		controller.TestUI:Txt1(self.WalkSpeed)		
 	end
 end
 

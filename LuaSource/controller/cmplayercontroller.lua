@@ -13,7 +13,6 @@ function CMPlayerController:HandleInput(name, ...)
 end
 
 function CMPlayerController:BeginPlay( )
-	-- A_(self.Role, self:GetRemoteRole())
 	if self:IsLocalPlayerController() then
 		self.TestUI = require "ui.test":NewCpp(self, self)
 	end
@@ -31,8 +30,9 @@ end
 
 function CMPlayerController:InputTap_Press(Pos)
 	self.m_Pawn:StartPress(Pos)
+	
 	-- self.PlayCharacter:SetActorHiddenInGame(true)
-	A_(self.PlayCharacter)
+	-- A_(self.PlayCharacter)
 end	
 
 function CMPlayerController:InputTap_Release(Pos, HoldTime)
@@ -47,10 +47,7 @@ function CMPlayerController:InputTap_Release(Pos, HoldTime)
 end		
 
 function CMPlayerController:MoveToPos(Pos)
-	-- UNavigationSystem.SimpleMoveToLocation(self, Pos)
-	A_(self.m_PlayCharacter)
 	self.m_PlayCharacter:GetController():MoveToLocation(Pos)
-	-- A_(self.m_theproxy:GetController())
 end
 
 function CMPlayerController:InputTap_Hold(Pos, HoldTime)
@@ -58,7 +55,9 @@ end
 
 function CMPlayerController:InputTap_Move(Pos, HoldTime, change)
 	self.m_Pawn:Move(Pos)
-	self.m_bHasMoveScreen = true
+	if math.abs(change[1]+change[2]) > 10 then
+		self.m_bHasMoveScreen = true
+	end
 end
 
 function CMPlayerController:GetAnimIns()

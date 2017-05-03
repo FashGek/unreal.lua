@@ -11,4 +11,6 @@ class CATCHME_API ACatchMeAIController : public AAIController
 	GENERATED_BODY()
 public:
 	ACatchMeAIController();
+	virtual void BeginPlay() override;
+	virtual void Possess(APawn* InPawn) override;
 };
