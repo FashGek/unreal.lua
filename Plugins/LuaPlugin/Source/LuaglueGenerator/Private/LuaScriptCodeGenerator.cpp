@@ -832,6 +832,10 @@ FString FLuaScriptCodeGenerator::GetPropertyType(UProperty* Property) const
 	{
 		return FString("UArrayProperty");
 	}
+	else if (Property->IsA(UByteProperty::StaticClass()))
+	{
+		return FString("UByteProperty");
+	}
 	else
 	{
 		return FString("");
@@ -856,6 +860,10 @@ FString FLuaScriptCodeGenerator::GetPropertyGetFunc(UProperty* Property) const
 	{
 		return FString("ContainerPtrToValuePtr<uint8>");
 	}
+	else if (Property->IsA(UByteProperty::StaticClass()))
+	{
+		return FString("GetPropertyValue_InContainer");
+	}
 	else
 	{
 		return FString("GetPropertyValue_InContainer");
@@ -871,6 +879,10 @@ FString FLuaScriptCodeGenerator::GetPropertySetFunc(UProperty* Property) const
 	else if (Property->IsA(UStructProperty::StaticClass()))
 	{
 		return FString("CopyCompleteValue");
+	}
+	else if (Property->IsA(UByteProperty::StaticClass()))
+	{
+		return FString("SetIntPropertyValue");
 	}
 	else
 	{
@@ -1067,6 +1079,8 @@ FString FLuaScriptCodeGenerator::SetterCode(FString ClassNameCPP, FString classn
 							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, (UObject*)value);\r\n"), *GetPropertySetFunc(Property));
 						else if (Property->IsA(UStructProperty::StaticClass()))
 							FunctionBody += FString::Printf(TEXT("\tp->%s(p->ContainerPtrToValuePtr<void>(Obj), (void*)value);\r\n"), *GetPropertySetFunc(Property));
+						else if (Property->IsA(UByteProperty::StaticClass()))
+							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, (int64)value);\r\n"), *GetPropertySetFunc(Property));
 						else
 							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, value);\r\n"), *GetPropertySetFunc(Property));
 					}
@@ -1093,6 +1107,8 @@ FString FLuaScriptCodeGenerator::SetterCode(FString ClassNameCPP, FString classn
 							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), (UObject*)value);\r\n"), *GetPropertySetFunc(innerType));
 						else if (innerType->IsA(UStructProperty::StaticClass()))
 							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(innerProperty->ContainerPtrToValuePtr<void>(result.GetRawPtr(i)), (void*)value);\r\n"), *GetPropertySetFunc(innerType));
+						else if (innerType->IsA(UByteProperty::StaticClass()))
+							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), (int64)value);\r\n"), *GetPropertySetFunc(innerType));
 						else
 							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), value);\r\n"), *GetPropertySetFunc(innerType));
 						FunctionBody += FString::Printf(TEXT("\t\tlua_pop(L, 1);\r\n\t}\r\n"));
