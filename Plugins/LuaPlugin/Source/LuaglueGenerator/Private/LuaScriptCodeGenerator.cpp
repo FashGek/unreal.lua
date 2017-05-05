@@ -882,7 +882,7 @@ FString FLuaScriptCodeGenerator::GetPropertySetFunc(UProperty* Property) const
 	}
 	else if (Property->IsA(UByteProperty::StaticClass()))
 	{
-		return FString("SetIntPropertyValue");
+		return FString("SetPropertyValue_InContainer");
 	}
 	else
 	{
@@ -1080,7 +1080,7 @@ FString FLuaScriptCodeGenerator::SetterCode(FString ClassNameCPP, FString classn
 						else if (Property->IsA(UStructProperty::StaticClass()))
 							FunctionBody += FString::Printf(TEXT("\tp->%s(p->ContainerPtrToValuePtr<void>(Obj), (void*)value);\r\n"), *GetPropertySetFunc(Property));
 						else if (Property->IsA(UByteProperty::StaticClass()))
-							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, (int64)value);\r\n"), *GetPropertySetFunc(Property));
+							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, (int)value);\r\n"), *GetPropertySetFunc(Property));
 						else
 							FunctionBody += FString::Printf(TEXT("\tp->%s(Obj, value);\r\n"), *GetPropertySetFunc(Property));
 					}
@@ -1108,7 +1108,7 @@ FString FLuaScriptCodeGenerator::SetterCode(FString ClassNameCPP, FString classn
 						else if (innerType->IsA(UStructProperty::StaticClass()))
 							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(innerProperty->ContainerPtrToValuePtr<void>(result.GetRawPtr(i)), (void*)value);\r\n"), *GetPropertySetFunc(innerType));
 						else if (innerType->IsA(UByteProperty::StaticClass()))
-							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), (int64)value);\r\n"), *GetPropertySetFunc(innerType));
+							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), (int)value);\r\n"), *GetPropertySetFunc(innerType));
 						else
 							FunctionBody += FString::Printf(TEXT("\t\tinnerProperty->%s(result.GetRawPtr(i), value);\r\n"), *GetPropertySetFunc(innerType));
 						FunctionBody += FString::Printf(TEXT("\t\tlua_pop(L, 1);\r\n\t}\r\n"));
