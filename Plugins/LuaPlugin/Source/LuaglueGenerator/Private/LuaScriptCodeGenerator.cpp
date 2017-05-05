@@ -57,7 +57,7 @@ FString FLuaScriptCodeGenerator::InitializeParam(UProperty* Param, int32 ParamIn
 		}
 		else if (Param->IsA(UStrProperty::StaticClass()))
 		{
-			Initializer = TEXT("ANSI_TO_TCHAR(luaL_checkstring");
+			Initializer = TEXT("UTF8_TO_TCHAR(luaL_checkstring");
 		}
 		else if (Param->IsA(UNameProperty::StaticClass()))
 		{
@@ -65,7 +65,7 @@ FString FLuaScriptCodeGenerator::InitializeParam(UProperty* Param, int32 ParamIn
 		}
 		else if (Param->IsA(UTextProperty::StaticClass()))
 		{
-			Initializer = TEXT("FText::FromString(luaL_checkstring");
+			Initializer = TEXT("FText::FromString(UTF8_TO_TCHAR(luaL_checkstring");
 		}
 		else if (Param->IsA(UBoolProperty::StaticClass()))
 		{
@@ -133,7 +133,10 @@ FString FLuaScriptCodeGenerator::InitializeParam(UProperty* Param, int32 ParamIn
 			Initializer = TEXT("(luaL_checkint");
 		}
 	}
-	return FString::Printf(TEXT("%s(L, %d))"), *Initializer, ParamIndex);
+	if (Param->IsA(UTextProperty::StaticClass()))
+		return FString::Printf(TEXT("%s(L, %d)))"), *Initializer, ParamIndex);
+	else
+		return FString::Printf(TEXT("%s(L, %d))"), *Initializer, ParamIndex);
 }
 
 FString FLuaScriptCodeGenerator::InitializeFunctionDispatchParam(UFunction* Function, UProperty* Param, int32 ParamIndex)
@@ -181,15 +184,15 @@ FString FLuaScriptCodeGenerator::Push(const FString& ClassNameCPP, UFunction* Fu
 	}
 	else if (ReturnValue->IsA(UStrProperty::StaticClass()))
 	{
-		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_ANSI(*%s));"), *name);
+		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_UTF8(*%s));"), *name);
 	}
 	else if (ReturnValue->IsA(UNameProperty::StaticClass()))
 	{
-		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_ANSI(*%s.ToString()));"), *name);
+		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_UTF8(*%s.ToString()));"), *name);
 	}
 	else if (ReturnValue->IsA(UTextProperty::StaticClass()))
 	{
-		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_ANSI(*%s.ToString()));"), *name);
+		Initializer = FString::Printf(TEXT("lua_pushstring(L, TCHAR_TO_UTF8(*%s.ToString()));"), *name);
 	}
 	else if (ReturnValue->IsA(UBoolProperty::StaticClass()))
 	{
