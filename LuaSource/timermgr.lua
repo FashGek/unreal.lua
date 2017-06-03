@@ -4,7 +4,7 @@ function Handle:Ctor(mgr, callback)
 	self.passtime = 0
 	self.num = 0
 	self.totalnum = 0
-	self.mgr = self
+	self.mgr = mgr
 	self.callback = callback
 end
 
@@ -44,7 +44,7 @@ function TimerMgr:Tick(delta)
 			h.passtime = h.passtime+delta
 			if h.passtime >= h.interval then
 				h.callback(h.passtime)
-				h.passtime = h.passtime - h.interval
+				h.passtime = 0
 				h.num = h.num + 1
 				if h.totalnum and h.totalnum >= h.num then
 					h:Destroy()

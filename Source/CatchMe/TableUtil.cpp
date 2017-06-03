@@ -3,8 +3,10 @@
 #include "TableUtil.h"
 #include "DelegateLuaProxy.h"
 #include "UObject/UObjectThreadContext.h"
-#include "GeneratedScriptLibraries.inl"
-
+#include "luaload.h"
+#include "lualoadgame.h"
+// #include "GeneratedScriptLibraries.inl"
+#include "allenum.script.h"
 DEFINE_LOG_CATEGORY(LuaLog);
 
 lua_State* UTableUtil::L = nullptr;
@@ -152,9 +154,14 @@ void UTableUtil::init(bool IsManual)
 		lua_setfield(L, LUA_GLOBALSINDEX, "_gamedir");
 
 		//register all function
-		LuaRegisterExportedClasses(L);
-		executeFunc("Init", 0, 0);
+		ULuaLoad::LoadAll(L);
+		ULuaLoadGame::LoadAll(L);
+		lua_pushboolean(L, IsManual);
+		executeFunc("Init", 0, 1);
+#ifdef LuaDebug
 		testtemplate();
+#endif // LuaDebug
+
 	}
 	HasManualInit = IsManual;
 }
@@ -340,6 +347,8 @@ void* tousertype(lua_State* L, const char* classname, int i)
 		return nullptr;
 	else if (lua_istable(L, i))
 	{
+		if (i < 0)
+			i = lua_gettop(L) + i+1;
 		lua_pushstring(L,  "_cppinstance_");
 		lua_rawget(L, i);
 		if (lua_isnil(L, -1))

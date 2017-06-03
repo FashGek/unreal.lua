@@ -9,6 +9,7 @@ function SimpleDlg:NewCpp(Object, ...)
 	end
 	local inscpp = UWidgetBlueprintLibrary.Create(Object, self.m_BpClass, nil)
 	local ins = self:NewOn(inscpp, ...)
+	ins:AddToViewport()
 	return ins
 end
 
@@ -19,7 +20,6 @@ function SimpleDlg:Ctor( ... )
 		self.m_widgets[names[i]] = {types[i], v}	
 	end
 	self.m_luawidgets = {}
-	self:AddToViewport()
 end
 
 function SimpleDlg:SetUmgPath(Path)

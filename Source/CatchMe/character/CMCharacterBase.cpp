@@ -34,3 +34,9 @@ void ACMCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void ACMCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	LuaCall("PostInitializeComponents", this);
+}
+

@@ -60,6 +60,8 @@ local GetValueWithDot
 local function GetValue(csvValue)
 	if tonumber(csvValue) then
 		return csvValue
+	elseif csvValue:lower() == "true" or csvValue:lower() == "false" then
+		return csvValue:lower()
 	else
 		local inner = csvValue:match("\"(.*)\"")
 		if inner then
@@ -114,6 +116,7 @@ local function GenerateLuaCode(CsvData)
 	local defaults = {}
 	local codes = {}
 	codes[1] = "local t = {"
+	-- a_(CsvData)
 	for csvRow in CsvData:gmatch("(.-)\n") do
 		index = index + 1
 		if index == 1 then

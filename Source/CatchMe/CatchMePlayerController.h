@@ -22,6 +22,18 @@ public:
 
 	UPROPERTY(Replicated)
 	ACharacter* PlayCharacter;
+
+	UFUNCTION(reliable, server, WithValidation)
+	void S_PlaySkill(int32 SkillId, AActor* Target);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void S_TapActor(AActor* Target);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void S_TapFloor(FVector Pos);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void S_RemoveFoliage(int32 Index);
 };
 
 

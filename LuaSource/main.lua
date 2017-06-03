@@ -1,5 +1,6 @@
-function Init()
+function Init(IsMannual)
     package.path = package.path .. ";".._luadir.."/?.lua"
+    package.cpath = package.cpath .. ";".._luadir.."/?.dll"
     require "frame.initrequire"
     local function ShowMem()
         collectgarbage("collect")
@@ -8,7 +9,10 @@ function Init()
     -- require ("util.csvtolua")(_gamedir.."/gameconfig") 
     InitLuahotupdate()
     TimerMgr:Get():On(ShowMem):Time(2)
-    -- require "util.sbcompletions".run()
+    G_IsMannul = IsMannual
+    if IsMannual then
+        -- require "util.sbcompletions".run()
+    end
 end
 
 function InitLuahotupdate()
@@ -27,6 +31,7 @@ function Tick(delta)
     end
     Xpcall(f)
 end
+
 --for object orientation
 -- execution sequence : basec++ ctor -> baselua ctor -> derivedc++ ctor -> derivedlua ctor
 function Ctor(classpath, inscpp, ...)
@@ -59,7 +64,7 @@ end
 function Call(functionName, inscpp, ...)
     if type(inscpp) == "table" and not inscpp._has_destroy_ then
         return inscpp[functionName](inscpp, ...)
-    else
+    elseif G_IsMannul then
         error("error in Call, No Exist such lua ins, Must Call LuaCtor Before use this:"..functionName.." "..type(inscpp).." "..tostring(inscpp._has_destroy_))
     end
 end

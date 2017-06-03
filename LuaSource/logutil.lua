@@ -8,6 +8,10 @@ end
 function Q_(t)
     a_(require "inspect"(t))    
 end
+function q_(...)
+    a_(...)
+    a_(debug.traceback())
+end
 function a_(...)
     local str = ""
     local temp = {...}

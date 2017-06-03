@@ -7,8 +7,15 @@ end
 function CMSpectatorPawn:Tick( )
 	local UI = self:GetController() and self:GetController().TestUI
 	if UI then
+		local x = self:K2_GetActorLocation().X /100+64
+		local y = self:K2_GetActorLocation().Y /100+64
 		UI:Txt2(self:K2_GetActorLocation())
-		UI:Txt3(self:K2_GetActorRotation())
+		-- UI:Txt2(tostring(x.."  "..y))
+		-- UI:Txt3(self:K2_GetActorRotation())
+	end
+	self.m_Player = self.m_Player or (self:GetController() and self:GetController().PlayCharacter)
+	if self.m_Player then
+		self:K2_SetActorLocation(self.m_Player:K2_GetActorLocation(), false, FHitResult.New(), true)
 	end
 end
 
@@ -19,6 +26,7 @@ end
 
 local factor = 2
 function CMSpectatorPawn:Move(Pos)
+	do return end
 	local Rotator = self.Controller.PlayerCameraManager:GetCameraRotation():Vector()
 	local ForwardVector = FVector.New(Rotator.X, Rotator.Y,0)
 	local PressPos = self.m_PressPos

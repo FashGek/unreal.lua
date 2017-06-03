@@ -1,15 +1,14 @@
 local m = {}
-
+local WorkingDir
 local function GetWorkingDir()
-	local HU = {}
-	if HU.WorkingDir == nil then
+	if WorkingDir == nil then
 	    local p = io.popen("echo %cd%")
 	    if p then
-	        HU.WorkingDir = p:read("*l").."\\"
+	        WorkingDir = p:read("*l").."\\"
 	        p:close()
 	    end
 	end
-	return HU.WorkingDir
+	return WorkingDir
 end
 
 local function Normalize(path)
@@ -45,22 +44,22 @@ function m.run()
 	   			local EnumName = ""
 	   			for code in io.lines(line) do
 		   			EnumName = code:match("static const EnumItem ([^_]+)_Enum") or EnumName
-		   			local ValueName = code:match("{ \"(.*)\",")
+		   			local ValueName = code:match("{ \"(.*)\"")
 		   			if ValueName then
-			   			exported["\""..EnumName.."."..ValueName.."\","] = true
+			   			exported["\""..EnumName.."."..ValueName.."\""] = true
 			   		end
 		   		end
    			else
 	   			local sourcefile = io.open(line, "r")
 	   			local source = sourcefile:read("*all")
 	   			for class, func in source:gmatch("static int32 ([^_]+)_([^%(]+)") do
-					exported["\""..class.."\","] = true
+					exported["\""..class.."\""] = true
 					local property = func:match("Get_(.*)")
 					if property then
-						exported["\""..property.."\","] = true
+						exported["\""..property.."\""] = true
 					elseif func:match("Set_(.*)") then
 					else
-						exported["\""..func.."\","] = true
+						exported["\""..func.."\""] = true
 					end
 				end
 			end
@@ -68,7 +67,9 @@ function m.run()
    	end
    	local code = "{\"completions\":["
    	for key, v in pairs(exported) do
-   		code = code..key.."\n"
+   		-- local temp = "{\"trigger\":"..key..", \"contents\":"..key.."},"
+   		local temp = key..","
+   		code = code..temp.."\n"
    	end
    	code = code.."]}"
 	-- local snipfile = io.open(_luadir.."\\sublimestuff\\".."completions.sublime-completions", "w")
