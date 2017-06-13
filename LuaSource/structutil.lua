@@ -81,5 +81,12 @@ function FTransform.Make(Location, Rotation, Scale)
 	return UKismetMathLibrary.MakeTransform(Location, Rotation, Scale)
 end
 
+function FTransform:Break()
+	local Location = FVector.New()
+	local Rotator = FRotator.New()
+	local Scale = FVector.New()
+	return UKismetMathLibrary.BreakTransform(self, Location, Rotator, Scale)
+end
+
 FVector2D.New = ULuautils.FVector2D_New
 FColor.New = ULuautils.FColor_New

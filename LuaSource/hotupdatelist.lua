@@ -8,6 +8,8 @@ local FileNameList = {
 	"baseskillfsm",
 	"skillfsm",
 	"cmcharacterbase",
+	"foliageactor",
+	"catchmeaicontroller",
 }
 return FileNameList
 

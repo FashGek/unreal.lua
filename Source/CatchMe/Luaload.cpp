@@ -793,6 +793,17 @@
 #include "MultiLineEditableTextBox.script.h"
 #include "RichTextBlock.script.h"
 #include "TextBlock.script.h"
+#include "FoliageInstancedStaticMeshComponent.script.h"
+#include "FoliageStatistics.script.h"
+#include "FoliageType.script.h"
+#include "InstancedFoliageActor.script.h"
+#include "InteractiveFoliageActor.script.h"
+#include "ProceduralFoliageBlockingVolume.script.h"
+#include "ProceduralFoliageComponent.script.h"
+#include "ProceduralFoliageSpawner.script.h"
+#include "ProceduralFoliageTile.script.h"
+#include "ProceduralFoliageVolume.script.h"
+#include "FoliageType_InstancedStaticMesh.script.h"
 #include "allEnum.script.h"
 
 void ULuaLoad::LoadAll(lua_State* L)
@@ -1586,6 +1597,17 @@ void ULuaLoad::LoadAll(lua_State* L)
 	UTableUtil::loadlib(MultiLineEditableTextBox_Lib, "UMultiLineEditableTextBox");
 	UTableUtil::loadlib(RichTextBlock_Lib, "URichTextBlock");
 	UTableUtil::loadlib(TextBlock_Lib, "UTextBlock");
+	UTableUtil::loadlib(FoliageInstancedStaticMeshComponent_Lib, "UFoliageInstancedStaticMeshComponent");
+	UTableUtil::loadlib(FoliageStatistics_Lib, "UFoliageStatistics");
+	UTableUtil::loadlib(FoliageType_Lib, "UFoliageType");
+	UTableUtil::loadlib(InstancedFoliageActor_Lib, "AInstancedFoliageActor");
+	UTableUtil::loadlib(InteractiveFoliageActor_Lib, "AInteractiveFoliageActor");
+	UTableUtil::loadlib(ProceduralFoliageBlockingVolume_Lib, "AProceduralFoliageBlockingVolume");
+	UTableUtil::loadlib(ProceduralFoliageComponent_Lib, "UProceduralFoliageComponent");
+	UTableUtil::loadlib(ProceduralFoliageSpawner_Lib, "UProceduralFoliageSpawner");
+	UTableUtil::loadlib(ProceduralFoliageTile_Lib, "UProceduralFoliageTile");
+	UTableUtil::loadlib(ProceduralFoliageVolume_Lib, "AProceduralFoliageVolume");
+	UTableUtil::loadlib(FoliageType_InstancedStaticMesh_Lib, "UFoliageType_InstancedStaticMesh");
 	UTableUtil::loadEnum(ELifetimeCondition_Enum, "ELifetimeCondition");
 	UTableUtil::loadEnum(ESearchCase_Enum, "ESearchCase");
 	UTableUtil::loadEnum(ESearchDir_Enum, "ESearchDir");

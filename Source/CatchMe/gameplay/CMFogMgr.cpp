@@ -87,9 +87,23 @@ bool UCMFogMgr::CanSee(FVector& Pos, int32 Targetx, int32 Targety)
 	TArray<AActor*> Ignore;
 	Ignore.Add(Cast<ACatchMePlayerController>(Controller)->PlayCharacter);
 	if (UKismetSystemLibrary::LineTraceSingle(Controller, Pos, TargetPos, ETraceTypeQuery::TraceTypeQuery1, true, Ignore, EDrawDebugTrace::None, Hit, true))
-		return false;
+	{
+		FVector_NetQuantize GridPos = TargetPos;
+		if (FVector::DistXY(GridPos, Hit.Location) <= 141)
+			return true;
+		else
+			return false;
+	}
 	else
 		return true;
+}
+
+bool UCMFogMgr::CanSeeNow(FVector& TargetPos)
+{
+	int32 FogMapFactor = MapSize / LandscapeSize;
+	int32 y = (TargetPos.X / 100 + LandscapeSize / 2)* FogMapFactor;
+	int32 x = (TargetPos.Y / 100 + LandscapeSize / 2)* FogMapFactor;
+	return CanSeeData[x * MapSize + y];
 }
 
 void UCMFogMgr::UpdateTexture()
@@ -101,7 +115,8 @@ void UCMFogMgr::UpdateTexture()
 void UCMFogMgr::UpdateLastTexture()
 {
 	Tx_Last_Fog->UpdateResource();
-	UpdateTextureRegions(Tx_Last_Fog, (int32)0, (uint32)1, LasttextureRegions, (uint32)(4 * MapSize), (uint32)4, (uint8*)Data.GetData(), false);
+	LastData = Data;
+	UpdateTextureRegions(Tx_Last_Fog, (int32)0, (uint32)1, LasttextureRegions, (uint32)(4 * MapSize), (uint32)4, (uint8*)LastData.GetData(), false);
 }
 
 void UCMFogMgr::UpdateFOV(FVector CharacterPos)
@@ -115,13 +130,16 @@ void UCMFogMgr::UpdateFOV(FVector CharacterPos)
 	int32 ArrSize = MapSize*MapSize;
 	UpdateLastTexture();
 	Data.Init(FogColor, ArrSize);
-
+	CanSeeData.Init(false, ArrSize);
 	for (int32 i = FMath::Max(x - len, 0); i <= FMath::Min(x + len, MapSize -1); i++)
 		for (int32 j = FMath::Max(y - len, 0); j <= FMath::Min(y + len, MapSize - 1); j++)
 		{
 			if ( FMath::Pow((i-x),2) + FMath::Pow((j - y), 2) <= Sqrt)
-				if (CanSee(CharacterPos, (float(i)/FogMapFactor - LandscapeSize/2)*100, (float(j) / FogMapFactor - LandscapeSize / 2) * 100))
+				if (CanSee(CharacterPos, (float(i) / FogMapFactor - LandscapeSize / 2) * 100, (float(j) / FogMapFactor - LandscapeSize / 2) * 100))
+				{
 					Data[i * MapSize + j] = ThroughColor;
+					CanSeeData[i * MapSize + j] = true;
+				}
 		}
 	UpdateTexture();
 }

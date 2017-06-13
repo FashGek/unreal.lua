@@ -81,6 +81,8 @@
 #include "Delegate_UEditableTextBox_OnTextChanged.script.h"
 #include "Delegate_UEditableTextBox_OnTextCommitted.script.h"
 #include "Delegate_UExpandableArea_OnExpansionChanged.script.h"
+#include "Delegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage.script.h"
+#include "Delegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage.script.h"
 #include "Delegate_UForceFeedbackComponent_OnForceFeedbackFinished.script.h"
 #include "Delegate_UInputKeySelector_OnIsSelectingKeyChanged.script.h"
 #include "Delegate_UInputKeySelector_OnKeySelected.script.h"
@@ -261,6 +263,8 @@ void ULuaLoadGame::LoadAll(lua_State* L)
 	UTableUtil::loadlib(Delegate_UEditableTextBox_OnTextChanged_Lib, "UDelegate_UEditableTextBox_OnTextChanged");
 	UTableUtil::loadlib(Delegate_UEditableTextBox_OnTextCommitted_Lib, "UDelegate_UEditableTextBox_OnTextCommitted");
 	UTableUtil::loadlib(Delegate_UExpandableArea_OnExpansionChanged_Lib, "UDelegate_UExpandableArea_OnExpansionChanged");
+	UTableUtil::loadlib(Delegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage_Lib, "UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage");
+	UTableUtil::loadlib(Delegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage_Lib, "UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage");
 	UTableUtil::loadlib(Delegate_UForceFeedbackComponent_OnForceFeedbackFinished_Lib, "UDelegate_UForceFeedbackComponent_OnForceFeedbackFinished");
 	UTableUtil::loadlib(Delegate_UInputKeySelector_OnIsSelectingKeyChanged_Lib, "UDelegate_UInputKeySelector_OnIsSelectingKeyChanged");
 	UTableUtil::loadlib(Delegate_UInputKeySelector_OnKeySelected_Lib, "UDelegate_UInputKeySelector_OnKeySelected");

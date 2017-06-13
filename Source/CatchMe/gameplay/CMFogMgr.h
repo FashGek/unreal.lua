@@ -14,8 +14,10 @@ public:
 
 	UPROPERTY()
 		UTexture2D *Tx_Last_Fog;
-
+	TMap<int32, FVector> TreeToCheckSee;
 	TArray<FColor> Data;
+	TArray<FColor> LastData;
+	TArray<bool> CanSeeData;
 	FUpdateTextureRegion2D* textureRegions;
 	FUpdateTextureRegion2D* LasttextureRegions;
 	FColor FogColor;
@@ -36,6 +38,9 @@ public:
 		bool bFreeData);
 
 	bool CanSee(FVector& Pos, int32 Targetx, int32 Targety);
+
+	UFUNCTION()
+	bool CanSeeNow(FVector& TargetPos);
 
 	UFUNCTION()
 	void UpdateTexture();

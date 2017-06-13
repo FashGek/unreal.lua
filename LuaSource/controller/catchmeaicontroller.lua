@@ -15,4 +15,12 @@ function CatchMeAIController:Possess(InPawn)
 	self:SetOwner(InPawn:GetOwner())
 end
 
+function CatchMeAIController:MoveToActor(actor)
+	if actor._cppclass then
+		ACatchMeAIController.MoveToActor(self, actor)
+	else
+		self:MoveToLocation(actor:K2_GetActorLocation())
+	end
+end
+
 return CatchMeAIController

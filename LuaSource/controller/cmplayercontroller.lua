@@ -16,13 +16,12 @@ function CMPlayerController:BeginPlay( )
 	if self:IsAuth() then
 		TimerMgr:Get():On(self.SpawnPlayer, self):Time(1):Num(1)
 	else
-		self:InitFogMgr()
 	end
 	if self:IsLocalPlayerController() then
+		self:InitFogMgr()
 		self.TestUI = require "ui.test":NewCpp(self, self)
 	end
 	self:GetFoliageActor()
-	-- self:Timer(self.GetFoliageActor, self):Time(1):Num(1)
 end
 
 function CMPlayerController:InitFogMgr()
@@ -31,13 +30,27 @@ function CMPlayerController:InitFogMgr()
 end
 
 function CMPlayerController:GetFoliageActor()
+	self.m_FoliageMeshs  = {}
+	for k, v in ipairs(Cfg("foliage")) do
+		self.m_FoliageMeshs[k] = UStaticMesh.LoadObject(self, v.Path)
+	end
 	local actors = UGameplayStatics.GetAllActorsOfClass(self, AActor.Class(), {})
+	self.m_FoliageComponents = {}
 	for k, v in ipairs(actors) do
 		if ULuautils.GetName(v):find("Foliage") then
-			local component = v:GetComponentByClass(UInstancedStaticMeshComponent.Class())
-			component = UInstancedStaticMeshComponent.Cast(component)
-			-- A_(component:GetInstanceCount())
-			self.m_FoliageComponent = component
+			for _, component in ipairs(v:GetComponentsByClass(UInstancedStaticMeshComponent.Class())) do
+				component = UInstancedStaticMeshComponent.Cast(component)
+				for index, StaticMesh in ipairs(self.m_FoliageMeshs) do
+					if component.StaticMesh == StaticMesh then
+						self.m_FoliageComponents[component] = index
+						self.m_FoliageComponents[index] = component
+						if self:IsLocalPlayerController() then
+							component:SetMaterial(0, self.m_FogMgr:GetMaterial(Cfg("foliage")[index].Material))
+						end
+						break
+					end
+				end
+			end
 		end
 	end
 end
@@ -51,19 +64,43 @@ function CMPlayerController:SpawnPlayer()
 	self.PlayCharacter = spawnActor
 	self.m_PlayCharacter = spawnActor
 	spawnActor:InitBaseInfo(1, 1)
+	spawnActor:SetPlayerController(self)
 end
 
-function CMPlayerController:RemoveFoliage(Index)
+function CMPlayerController:RemoveFoliage(FoliageComponent, Index)
+	local FoliageIndex = self.m_FoliageComponents[FoliageComponent]
 	if not self:IsAuth() then
-		self:S_RemoveFoliage(Index)
+		self:S_RemoveFoliage(FoliageIndex, Index)
 	end
-	self:S_RemoveFoliage_Imp(Index)
+	self:S_RemoveFoliage_Imp(FoliageIndex, Index)
 end
 
-function CMPlayerController:S_RemoveFoliage_Imp(Index)
-	if self.m_FoliageComponent then
-		self.m_FoliageComponent:RemoveInstance(Index)
-		ULuautils.UpdateNav(self.m_FoliageComponent)
+function CMPlayerController:S_RemoveFoliage_Imp(FoliageIndex, Index)
+	local FoliageComponent 
+	if self.m_FoliageComponents then
+		FoliageComponent = UInstancedStaticMeshComponent.Cast(self.m_FoliageComponents[FoliageIndex])
+	end
+	local function Remove()
+		if FoliageComponent then
+			FoliageComponent:RemoveInstance(Index)
+			ULuautils.UpdateNav(FoliageComponent)
+		end
+	end
+	if self:IsAuth() then
+		Remove()
+		local actors = UGameplayStatics.GetAllActorsOfClass(self, ACatchMePlayerController.Class(), {})
+		for k, v in pairs(actors) do
+			v:C_RemoveFoliage(FoliageIndex,Index)
+		end
+	else
+		local TransForm = FTransform.New()
+		FoliageComponent:GetInstanceTransform(Index, TransForm, true)
+		local Pos = TransForm:Break()
+		if self.m_FogMgr:CanSeeNow(Pos) then
+			Remove()
+		else
+			A_("no")
+		end
 	end
 end
 
@@ -81,7 +118,19 @@ function CMPlayerController:InputTap_Release(Pos, HoldTime)
 				self:S_TapActor(actor)
 			else
 				if ULuautils.GetName(actor):find("Foliage") then
-					self:RemoveFoliage(Hit.Item)
+					-- Hit.Component:Get()
+					-- A_(self.m_FoliageComponents[FoliageComponent ])
+					-- FoliageComponent = UInstancedStaticMeshComponent.Cast(FoliageComponent)
+					-- A_(FoliageComponent.StaticMesh)
+					-- A_(UStaticMesh.LoadObject(self, "StaticMesh'/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder'"))
+					-- A_(ULuautils.GetName(actor))
+
+					-- self:RemoveFoliage(Hit.Component:Get(), Hit.Item)
+
+					-- A_(Hit.Distance)
+					-- self:S_TapFloor(Hit.ImpactPoint)
+					
+					self:S_TapFoliage(Hit.Component:Get(), Hit.Item)
 				else
 					self:S_TapFloor(Hit.ImpactPoint)
 				end
@@ -129,6 +178,15 @@ function CMPlayerController:S_TapActor_Imp(Actor)
 	end
 end
 
+function CMPlayerController:S_TapFoliage_Imp(Component, Index)
+	if self.m_PlayCharacter then
+
+		local FoliageClass = require "gameplay.foliageactor"
+		local newone = FoliageClass:New(Component, Index)
+		self.m_PlayCharacter:TapActor(newone)
+	end
+end
+
 function CMPlayerController:Visible(character)
 	if not self.PlayCharacter then 
 		return false
@@ -139,7 +197,7 @@ function CMPlayerController:Visible(character)
 		local StartPos = self.PlayCharacter:K2_GetActorLocation()
 		local EndPos = character:K2_GetActorLocation() 
 		local Hit = FHitResult.New()
-		if UKismetSystemLibrary.LineTraceSingle_NEW(self.PlayCharacter, StartPos, EndPos, ETraceTypeQuery.TraceTypeQuery1, true, {}, EDrawDebugTrace.None, Hit, true) then
+		if UKismetSystemLibrary.LineTraceSingle(self.PlayCharacter, StartPos, EndPos, ETraceTypeQuery.TraceTypeQuery1, true, {}, EDrawDebugTrace.None, Hit, true) then
 			if Hit.Actor:Get() == character then
 				return true
 			else

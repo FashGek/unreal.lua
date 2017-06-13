@@ -90,7 +90,7 @@ end
 
 function CatchMeCharacter:ActTargetSkill()
 	if self.m_TargetActor and not self.m_SkillFsm then
-		A_("AT ", self.m_TargetActor:GetName())
+		-- A_("AT ", self.m_TargetActor:GetName())
 		self:SkillFsm(self.m_CurrentSkillInfo.Fsm)
 	end
 end
@@ -257,4 +257,11 @@ function CatchMeCharacter_GetLifetimeReplicatedProps()
 	return t
 end
 
+function CatchMeCharacter:SetPlayerController(controller)
+	self.m_PlayerController = controller
+end
+
+function CatchMeCharacter:GetPlayerController()
+	return self.m_PlayerController 
+end
 return CatchMeCharacter

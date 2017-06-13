@@ -200,7 +200,7 @@ public:
 	// static FLuaGcObj gcobjs;
 	static int push() { return 0; }
 	template<typename T>
-	static int push(T& value);
+	static int push(const T& value);
 	template<typename T>
 	static int push(T* value);
 
@@ -210,16 +210,16 @@ public:
 	static int push(float value);
 	static int push(double value);
 	static int push(bool value);
-	static int push(FString value);
-	static int push(FText value);
-	static int push(FName value);
+	static int push(const FString& value);
+	static int push(const FText& value);
+	static int push(const FName& value);
 	static int push(const char* value);
 	static void testtemplate();
 	template<class T> 
-	static int push(TArray<T> value);
+	static int push(const TArray<T>& value);
 
 	template<class T>
-	static int push(TWeakObjectPtr<T> value);
+	static int push(const TWeakObjectPtr<T>& value);
 
 	
 
@@ -284,7 +284,7 @@ int UTableUtil::push(T* value)
 }
 
 template<typename T>
-int UTableUtil::push(T& value)
+int UTableUtil::push(const T& value)
 {
 	// 	struct name trait, because xcode project GCC_ENABLE_CPP_RTTI = No, can't use typeid
 	// 	pushclass(traitstructclass<T>::name(), (void*)(new T(value)), true);
@@ -293,7 +293,7 @@ int UTableUtil::push(T& value)
 }
 
 template<class T> 
-int UTableUtil::push(TArray<T> value)
+int UTableUtil::push(const TArray<T>& value)
 {
 	lua_newtable(L);
 	for (int i = 0; i < value.Num(); i++)
@@ -306,7 +306,7 @@ int UTableUtil::push(TArray<T> value)
 }
 
 template<class T>
-int UTableUtil::push(TWeakObjectPtr<T> value)
+int UTableUtil::push(const TWeakObjectPtr<T>& value)
 {
 	T *p = (T *)(value.Get());
 	typename traitweakclass<T>::traitType* weakObj = new typename traitweakclass<T>::traitType(p);

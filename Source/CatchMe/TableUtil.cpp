@@ -418,19 +418,19 @@ int UTableUtil::push(bool value)
 	return 1;
 }
 
-int UTableUtil::push(FString value)
+int UTableUtil::push(const FString& value)
 {
 	lua_pushstring(L, TCHAR_TO_ANSI(*value));
 	return 1;
 }
 
-int UTableUtil::push(FText value)
+int UTableUtil::push(const FText& value)
 {
 	lua_pushstring(L, TCHAR_TO_ANSI(*value.ToString()));
 	return 1;
 }
 
-int UTableUtil::push(FName value)
+int UTableUtil::push(const FName& value)
 {
 	lua_pushstring(L, TCHAR_TO_ANSI(*value.ToString()));
 	return 1;

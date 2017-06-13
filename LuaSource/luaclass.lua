@@ -157,7 +157,7 @@ end
 Class = Inherit
 
 ObjectBase = Inherit(Object)
-
+ObjectBase.New = Object.NewIns
 function ObjectBase:Ctor()
 	self._timer_handles_ = {}
 	self._event_handles_ = {}

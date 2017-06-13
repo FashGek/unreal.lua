@@ -4918,6 +4918,84 @@ public:
 };
 
 UCLASS(meta=(Lua=1))
+class UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage : public UObject{
+	GENERATED_BODY()
+public:
+	TSet<int> LuaCallBacks;
+	UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage() {};
+	template<typename T>
+	void Init(T& theDelegate){
+		UTableUtil::addgcref((UObject*)this);
+		theDelegate.AddDynamic(this, &UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakePointDamage::CallBack);
+	}
+
+	UFUNCTION()
+	void CallBack( int32 InstanceIndex, float Damage, AController* InstigatedBy, FVector HitLocation, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser){
+		for (auto v : LuaCallBacks){
+			UTableUtil::call(v,  InstanceIndex, Damage, InstigatedBy, HitLocation, ShotFromDirection, DamageType, DamageCauser);
+		}
+	}
+
+	UFUNCTION()
+	int Add() {int r = UTableUtil::pushluafunc(2);LuaCallBacks.Add(r);return r;}
+	UFUNCTION()
+	void Remove(int32 r)
+	{
+		if(LuaCallBacks.Contains(r)){
+			UTableUtil::unref(r);
+			LuaCallBacks.Remove(r);
+		}
+	}
+	UFUNCTION()
+	void Destroy() {
+		for(auto v : LuaCallBacks){
+			UTableUtil::unref(v);
+		}
+		LuaCallBacks.Reset();
+		UTableUtil::rmgcref(this);
+	}
+};
+
+UCLASS(meta=(Lua=1))
+class UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage : public UObject{
+	GENERATED_BODY()
+public:
+	TSet<int> LuaCallBacks;
+	UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage() {};
+	template<typename T>
+	void Init(T& theDelegate){
+		UTableUtil::addgcref((UObject*)this);
+		theDelegate.AddDynamic(this, &UDelegate_UFoliageInstancedStaticMeshComponent_OnInstanceTakeRadialDamage::CallBack);
+	}
+
+	UFUNCTION()
+	void CallBack( const TArray<int32>& Instances, const TArray<float>& Damages, AController* InstigatedBy, FVector Origin, float MaxRadius, const UDamageType* DamageType, AActor* DamageCauser){
+		for (auto v : LuaCallBacks){
+			UTableUtil::call(v,  Instances, Damages, InstigatedBy, Origin, MaxRadius, DamageType, DamageCauser);
+		}
+	}
+
+	UFUNCTION()
+	int Add() {int r = UTableUtil::pushluafunc(2);LuaCallBacks.Add(r);return r;}
+	UFUNCTION()
+	void Remove(int32 r)
+	{
+		if(LuaCallBacks.Contains(r)){
+			UTableUtil::unref(r);
+			LuaCallBacks.Remove(r);
+		}
+	}
+	UFUNCTION()
+	void Destroy() {
+		for(auto v : LuaCallBacks){
+			UTableUtil::unref(v);
+		}
+		LuaCallBacks.Reset();
+		UTableUtil::rmgcref(this);
+	}
+};
+
+UCLASS(meta=(Lua=1))
 class UDelegate_ACatchMeAIController_ReceiveMoveCompleted : public UObject{
 	GENERATED_BODY()
 public:

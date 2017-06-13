@@ -34,12 +34,17 @@ void ACatchMePlayerController::GetLifetimeReplicatedProps(TArray< FLifetimePrope
 	}
 }
 
-void ACatchMePlayerController::S_RemoveFoliage_Implementation(int32 Index)
+void ACatchMePlayerController::C_RemoveFoliage_Implementation(int32 FoliageComponentIndex, int32 Index)
 {
-	LuaCall("S_RemoveFoliage_Imp", this, Index);
+	LuaCall("S_RemoveFoliage_Imp", this, FoliageComponentIndex, Index);
 }
 
-bool ACatchMePlayerController::S_RemoveFoliage_Validate(int32 Index)
+void ACatchMePlayerController::S_RemoveFoliage_Implementation(int32 FoliageComponentIndex, int32 Index)
+{
+	LuaCall("S_RemoveFoliage_Imp", this, FoliageComponentIndex, Index);
+}
+
+bool ACatchMePlayerController::S_RemoveFoliage_Validate(int32 FoliageComponentIndex, int32 Index)
 {
 	return true;
 }
@@ -54,6 +59,18 @@ bool ACatchMePlayerController::S_TapActor_Validate(AActor* Target)
 {
 	return true;
 }
+
+
+void ACatchMePlayerController::S_TapFoliage_Implementation(UObject* Component, int32 Index)
+{
+	LuaCall("S_TapFoliage_Imp", this, Component, Index);
+}
+
+bool ACatchMePlayerController::S_TapFoliage_Validate(UObject* Component, int32 Index)
+{
+	return true;
+}
+
 
 void ACatchMePlayerController::S_TapFloor_Implementation(FVector Pos)
 {
